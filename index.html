@@ -266,6 +266,24 @@ select.tb-select, input.tb-input, input[type=color].tb-color{
 .block-removable:hover .block-del-btn{display:flex;}
 .exporting .block-del-btn{display:none !important;}
 
+/* drag handle to reorder any content block (question, section, box...) by dragging it */
+.block-drag-handle{
+  position:absolute;top:-11px;inset-inline-end:-11px;width:22px;height:22px;border-radius:50%;
+  background:var(--navy);color:#fff;border:2px solid #fff;font-size:12px;cursor:grab;
+  display:none;align-items:center;justify-content:center;z-index:8;box-shadow:0 2px 8px rgba(0,0,0,.3);
+}
+.block-removable:hover .block-drag-handle{display:flex;}
+.exporting .block-drag-handle{display:none !important;}
+.block-removable.dragging{opacity:.4;}
+
+/* per-question color picker: lets each question have its own accent color, independent of the subject color */
+.q-color-picker{
+  position:absolute;bottom:-9px;inset-inline-start:-9px;width:20px;height:20px;padding:0;
+  border:2px solid #fff;border-radius:50%;cursor:pointer;display:none;z-index:8;box-shadow:0 2px 8px rgba(0,0,0,.3);
+}
+.block-removable:hover .q-color-picker{display:block;}
+.exporting .q-color-picker{display:none !important;}
+
 /* About modal */
 .about-overlay{
   position:fixed;inset:0;background:rgba(10,12,20,.65);display:none;
@@ -413,13 +431,13 @@ select.tb-select, input.tb-input, input[type=color].tb-color{
   flex:none;width:26px;height:26px;border-radius:50%;background:var(--subject-color,var(--navy));
   color:#fff;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;
 }
-.q-text{flex:1;font-size:14.5px;line-height:1.9;}
+.q-text{flex:1;font-size:calc(14.5px * var(--qscale,1));line-height:1.9;}
 .q-score{
   flex:none;font-size:11px;font-weight:800;color:#fff;background:var(--subject-color,var(--navy));
   border-radius:30px;padding:3px 10px;
 }
 .q-score[contenteditable]{cursor:text;}
-.q-options{display:flex;flex-wrap:wrap;gap:10px 26px;margin:8px 0 0 36px;font-size:13.5px;}
+.q-options{display:flex;flex-wrap:wrap;gap:10px 26px;margin:8px 0 0 36px;font-size:calc(13.5px * var(--qscale,1));}
 .q-options .opt{display:flex;align-items:center;gap:7px;}
 .q-options .opt-letter{
   flex:none;font-size:17px;font-weight:800;color:var(--subject-color,var(--navy));
@@ -440,17 +458,17 @@ select.tb-select, input.tb-input, input[type=color].tb-color{
   font-size:13px;font-weight:700;color:var(--subject-color,var(--navy));
 }
 .answer-box[contenteditable]{cursor:text;}
-.q-tf{display:flex;gap:18px;margin:8px 0 0 36px;font-size:13px;}
+.q-tf{display:flex;gap:18px;margin:8px 0 0 36px;font-size:calc(13px * var(--qscale,1));}
 .q-blank{margin:8px 0 0 36px;border-bottom:1px dotted #888;min-height:24px;}
 .q-essay-lines{margin:10px 0 0 36px;}
 .q-essay-lines div{border-bottom:1px dotted #b8b2a0;height:24px;}
-.q-table{margin:10px 0 0 36px;border-collapse:collapse;width:calc(100% - 36px);font-size:13px;}
+.q-table{margin:10px 0 0 36px;border-collapse:collapse;width:calc(100% - 36px);font-size:calc(13px * var(--qscale,1));}
 
 /* بیرکاری — math working area (graph-paper style scratch space) */
 .q-math-area{
   margin:10px 0 0 36px;min-height:100px;border:1.5px solid var(--line);border-radius:6px;
   background-image:linear-gradient(#e9e4d3 1px, transparent 1px),linear-gradient(90deg,#e9e4d3 1px, transparent 1px);
-  background-size:18px 18px;font-size:13.5px;padding:6px;
+  background-size:18px 18px;font-size:calc(13.5px * var(--qscale,1));padding:6px;
 }
 .q-math-area[contenteditable]{cursor:text;}
 
@@ -467,6 +485,8 @@ select.tb-select, input.tb-input, input[type=color].tb-color{
 .frac-inline .frac-top,.frac-inline .frac-bottom{padding:0 4px;min-width:10px;}
 .frac-inline .frac-bar{width:100%;height:1.4px;background:currentColor;margin:1px 0;}
 .q-table td,.q-table th{border:1px solid var(--line);padding:6px 8px;}
+.draggable-item .free-table{margin:0;width:100%;height:100%;border-collapse:collapse;font-size:13px;table-layout:fixed;background:#fff;}
+.draggable-item .free-table td,.draggable-item .free-table th{border:1px solid var(--line);padding:6px 8px;overflow:hidden;}
 
 /* کەرتی نهێنی — perforated secret-number cut section */
 .cut-section{width:110px;margin:14px auto;display:flex;flex-direction:column;align-items:center;position:relative;}
@@ -492,6 +512,16 @@ select.tb-select, input.tb-input, input[type=color].tb-color{
 .draggable-item:hover .del-x{display:flex;}
 .resize-handle{position:absolute;bottom:-6px;inset-inline-end:-6px;width:13px;height:13px;background:var(--gold);border-radius:3px;cursor:nwse-resize;display:none;}
 .draggable-item:hover .resize-handle{display:block;}
+
+/* rotation handle for shapes — drag it around the shape to spin it to any angle */
+.rotate-handle{
+  position:absolute;top:-26px;left:50%;transform:translateX(-50%);width:20px;height:20px;border-radius:50%;
+  background:var(--teal);color:#fff;display:none;align-items:center;justify-content:center;font-size:13px;
+  cursor:grab;z-index:7;box-shadow:0 1px 4px rgba(0,0,0,.3);touch-action:none;
+}
+.draggable-item:hover .rotate-handle{display:flex;}
+.exporting .rotate-handle{display:none !important;}
+.shape-inner{width:100%;height:100%;}
 
 .divider-line{border:none;border-top:2px dashed var(--line);margin:18px 0;}
 
@@ -527,6 +557,7 @@ select.tb-select, input.tb-input, input[type=color].tb-color{
 }
 .exporting .shape-controls{display:none !important;}
 .exporting .page-toolbar{display:none !important;}
+.exporting .rotate-handle,.exporting .block-drag-handle,.exporting .q-color-picker{display:none !important;}
 
 footer.hint{color:#9aa0b4;font-size:11.5px;max-width:600px;text-align:center;}
 
@@ -830,6 +861,15 @@ footer.hint{color:#9aa0b4;font-size:11.5px;max-width:600px;text-align:center;}
       <div class="tb-row">
         <button class="tb-btn" id="boldAllBtn"><span class="ic">B+</span><span data-i18n="boldAll">بۆڵدی هەمووی بکە</span></button>
       </div>
+      <span class="tb-label" data-i18n="allQSizeLbl">گەورەیی دەقی هەموو پرسیارەکان (بەیەک کلیک)</span>
+      <div class="tb-row">
+        <button class="tb-btn" data-qsize="0.78"><span class="ic">A</span><span data-i18n="qSizeS">بچووک</span></button>
+        <button class="tb-btn" data-qsize="1"><span class="ic">A</span><span data-i18n="qSizeM">ناوەند</span></button>
+      </div>
+      <div class="tb-row">
+        <button class="tb-btn" data-qsize="1.35"><span class="ic">A</span><span data-i18n="qSizeL">گەورە</span></button>
+        <button class="tb-btn" data-qsize="1.7"><span class="ic">A</span><span data-i18n="qSizeXl">زۆر گەورە</span></button>
+      </div>
       <span class="tb-label" data-i18n="textAlign">ئاراستەی نووسین</span>
       <div class="tb-row">
         <button class="tb-btn" data-cmd="justifyRight"><span class="ic">➡</span></button>
@@ -944,9 +984,11 @@ ku:{
  trueLbl:"ڕاست", falseLbl:"هەڵە", writeQuestion:"دەقی پرسیارەکە لێرە بنووسە...", sectionLbl:"ناونیشانی بەش", score:"نمرە",
  colOne:"ستوونی یەکەم...", colTwo:"ستوونی دووەم...",
  removeBlock:"سڕینەوەی ئەم بەشە", headerDeleteTitle:"سڕینەوەی سەرنووس", headerRestoreTitle:"گەڕاندنەوەی سەرنووس", termLbl:"خولی یەکەم",
+ tableRowsPrompt:"چەند ڕیز دەتەوێت؟", tableColsPrompt:"چەند ستوون دەتەوێت؟",
  mcqColsLbl:"ژمارەی هەڵبژاردن لە هەر ڕیزێک", addFraction:"کەرتی ڕێژە (کەسر)", addExponent:"ژمارەی توانا",
  fracTop:"ژمارەی سەرەوە", fracBottom:"ژمارەی خوارەوە", baseNum:"بنچینە", expNum:"توان", mathStructures:"پێکهاتەی بیرکاری (کلیک بکە بۆ زیادکردن لە شوێنی کەرسەر)",
  wholeBlockLbl:"بۆڵدکردنی هەموو دەقی پرسیارەکە بەیەکجار", boldAll:"بۆڵدی هەمووی بکە",
+ allQSizeLbl:"گەورەیی دەقی هەموو پرسیارەکان (بەیەک کلیک)", qSizeS:"بچووک", qSizeM:"ناوەند", qSizeL:"گەورە", qSizeXl:"زۆر گەورە",
  addMath:"پرسیاری بیرکاری", addFree:"کەرتی ئازاد", writeMathQuestion:"پرسیارە بیرکارییەکە لێرە بنووسە...",
  textAlign:"ئاراستەی نووسین", bgSizeLbl:"شێوازی قیاسی وێنە", bgCover:"پڕکردنەوە (Cover)", bgContain:"بینینی تەواو (Contain)", bgStretch:"ڕاکێشان (Stretch)", bgScaleLbl:"گەورەکردن/بچووککردنەوە",
  aboutTitle:"دەربارەی ئەپڵیکەیشن", aboutText:"ئەم ئەپڵیکەیشنە لەلایەن Bako Xafur دروستکراوە، دەرچووی بەشی زانستی کۆمپیوتەر و شارەزای پڕۆگرامینگ.", aboutClose:"باشە"
@@ -981,9 +1023,11 @@ ar:{
  trueLbl:"صح", falseLbl:"خطأ", writeQuestion:"اكتب نص السؤال هنا...", sectionLbl:"عنوان القسم", score:"الدرجة",
  colOne:"العمود الأول...", colTwo:"العمود الثاني...",
  removeBlock:"حذف هذا الجزء", headerDeleteTitle:"حذف الترويسة", headerRestoreTitle:"استعادة الترويسة", termLbl:"الفصل الأول",
+ tableRowsPrompt:"كم عدد الصفوف؟", tableColsPrompt:"كم عدد الأعمدة؟",
  mcqColsLbl:"عدد الخيارات في كل صف", addFraction:"قسم كسر", addExponent:"رقم أُس",
  fracTop:"الرقم العلوي", fracBottom:"الرقم السفلي", baseNum:"الأساس", expNum:"الأُس", mathStructures:"تراكيب رياضية (اضغط للإضافة عند المؤشر)",
  wholeBlockLbl:"تعريض كل نص السؤال دفعة واحدة", boldAll:"تعريض الكل",
+ allQSizeLbl:"حجم نص كل الأسئلة (بضغطة واحدة)", qSizeS:"صغير", qSizeM:"متوسط", qSizeL:"كبير", qSizeXl:"كبير جداً",
  addMath:"سؤال رياضي", addFree:"قسم حر", writeMathQuestion:"اكتب السؤال الرياضي هنا...",
  textAlign:"محاذاة النص", bgSizeLbl:"نمط حجم الصورة", bgCover:"تغطية (Cover)", bgContain:"احتواء (Contain)", bgStretch:"تمديد (Stretch)", bgScaleLbl:"تكبير/تصغير الصورة",
  aboutTitle:"حول التطبيق", aboutText:"تم تطوير هذا التطبيق بواسطة Bako Xafur، خريج قسم علوم الحاسوب ومتخصص في البرمجة.", aboutClose:"حسناً"
@@ -1018,9 +1062,11 @@ en:{
  trueLbl:"True", falseLbl:"False", writeQuestion:"Write the question text here...", sectionLbl:"Section title", score:"Score",
  colOne:"Column one...", colTwo:"Column two...",
  removeBlock:"Remove this block", headerDeleteTitle:"Delete header", headerRestoreTitle:"Restore header", termLbl:"First Term",
+ tableRowsPrompt:"How many rows?", tableColsPrompt:"How many columns?",
  mcqColsLbl:"Choices per row", addFraction:"Fraction block", addExponent:"Exponent number",
  fracTop:"Top number", fracBottom:"Bottom number", baseNum:"Base", expNum:"Exponent", mathStructures:"Math structures (click to insert at cursor)",
  wholeBlockLbl:"Bold the whole question text at once", boldAll:"Bold all",
+ allQSizeLbl:"Size of all questions' text (one click)", qSizeS:"Small", qSizeM:"Medium", qSizeL:"Large", qSizeXl:"Extra large",
  addMath:"Math question", addFree:"Free section", writeMathQuestion:"Write the math question here...",
  textAlign:"Text align", bgSizeLbl:"Image size mode", bgCover:"Cover", bgContain:"Contain", bgStretch:"Stretch", bgScaleLbl:"Zoom (enlarge/shrink)",
  aboutTitle:"About this app", aboutText:"This application was developed by Bako Xafur, a Computer Science graduate and programming specialist.", aboutClose:"OK"
@@ -1670,12 +1716,80 @@ function addBlock(type){
   delBtn.title = d.removeBlock;
   delBtn.addEventListener('click', ()=>{ holder.remove(); refreshScore(); renumberQuestions(); });
   holder.appendChild(delBtn);
+
+  /* drag handle: lets the user pick up any question/section/box and move it to a new place */
+  const dragHandle = document.createElement('button');
+  dragHandle.className = 'block-drag-handle ui-only';
+  dragHandle.type = 'button';
+  dragHandle.innerHTML = '⠿';
+  dragHandle.title = 'ڕایکێشە بۆ گواستنەوە';
+  holder.appendChild(dragHandle);
+  initBlockDrag(holder, dragHandle);
+
+  /* per-question color picker: lets this specific question have its own color, separate from the subject color */
+  if(node.style && node.style.getPropertyValue('--subject-color')){
+    const colorPicker = document.createElement('input');
+    colorPicker.type = 'color';
+    colorPicker.className = 'q-color-picker ui-only';
+    colorPicker.title = 'ڕەنگی تایبەت بەم پرسیارە';
+    colorPicker.value = subjectColorVar();
+    colorPicker.addEventListener('input', e=> node.style.setProperty('--subject-color', e.target.value));
+    colorPicker.addEventListener('pointerdown', e=> e.stopPropagation());
+    holder.appendChild(colorPicker);
+  }
+
   canvas.appendChild(holder);
   refreshScore();
   renumberQuestions();
 }
+
+/* ============================================================
+   DRAG-TO-REORDER CONTENT BLOCKS
+   Pick up any block by its ⠿ handle and drop it anywhere else
+   on the page to change its order (numbers stay continuous).
+============================================================ */
+let dragSrcHolder = null;
+function initBlockDrag(holder, handle){
+  holder.draggable = false;
+  handle.addEventListener('pointerdown', ()=>{ holder.draggable = true; });
+  handle.addEventListener('pointerup', ()=> setTimeout(()=>{ holder.draggable = false; }, 50));
+  holder.addEventListener('dragstart', e=>{
+    dragSrcHolder = holder;
+    try{ e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain',''); }catch(err){}
+    holder.classList.add('dragging');
+  });
+  holder.addEventListener('dragend', ()=>{
+    holder.classList.remove('dragging');
+    holder.draggable = false;
+    dragSrcHolder = null;
+    refreshScore();
+    renumberQuestions();
+  });
+}
+function getDragAfterElement(canvas, y){
+  const els = [...canvas.querySelectorAll(':scope > .block-removable:not(.dragging)')];
+  return els.reduce((closest, child)=>{
+    const box = child.getBoundingClientRect();
+    const offset = y - box.top - box.height/2;
+    if(offset<0 && offset>closest.offset){ return {offset, element:child}; }
+    return closest;
+  }, {offset:-Infinity, element:null}).element;
+}
+document.getElementById('pagesContainer').addEventListener('dragover', e=>{
+  if(!dragSrcHolder) return;
+  const canvas = e.target.closest('.page-body');
+  if(!canvas) return;
+  e.preventDefault();
+  const after = getDragAfterElement(canvas, e.clientY);
+  if(after == null){ canvas.appendChild(dragSrcHolder); }
+  else { canvas.insertBefore(dragSrcHolder, after); }
+});
 document.querySelectorAll('[data-add]').forEach(btn=>{
-  btn.addEventListener('click', ()=> addBlock(btn.dataset.add));
+  if(btn.dataset.add === 'table'){
+    btn.addEventListener('click', dropTable);
+  } else {
+    btn.addEventListener('click', ()=> addBlock(btn.dataset.add));
+  }
 });
 
 /* live score totalling */
@@ -1787,16 +1901,32 @@ document.getElementById('fontFamily').addEventListener('change', e=>{
   else { execFormat('fontName', e.target.value); }
 });
 
+/* one-click resize of every question's text size at once (small / medium / large / extra large) */
+document.querySelectorAll('[data-qsize]').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.getElementById('pagesContainer').style.setProperty('--qscale', btn.dataset.qsize);
+  });
+});
+
 /* ============================================================
    MATH: SYMBOLS + KATEX EQUATIONS
 ============================================================ */
 const SYMBOLS = ['+','×','÷','√','π','∞','≤','≥','≠','∑','∫','Δ','θ','α','β','°','½','¾','∝','≈','∂','∇','∪','∩','⊂','∈','∀','∃','→','⇒',
   '⇔','↔','∴','∵','<','>','∬','γ','-','λ','μ','σ','φ','ω','χ','ψ','η','ξ','ρ','τ','ℝ','ℕ','ℤ','ℚ','ℂ','∠','⊥','∥','≅','∼',
   '⊆','⊇','⊄','∶','%','√','′','″','∛','∜','⌀','ƒ','∝','≡','⊕','⊗','⌈','⌉','⌊','⌋','∣','∤','⋅','∎','▲','▼','◯','□'];
+/* trig / log function names and a few extra operators, requested in addition to the symbol list above */
+const SYMBOL_WORDS = ['sin','cos','tan','cot','sec','csc','log','ln','lim','mod','±','∓','∮','∅','⇌','!'];
 const symGrid = document.getElementById('symbolGrid');
 SYMBOLS.forEach(s=>{
   const b = document.createElement('button');
   b.textContent = s;
+  b.addEventListener('click', ()=> insertAtCursor(s));
+  symGrid.appendChild(b);
+});
+SYMBOL_WORDS.forEach(s=>{
+  const b = document.createElement('button');
+  b.textContent = s;
+  if(s.length>1) b.style.fontSize='10.5px';
   b.addEventListener('click', ()=> insertAtCursor(s));
   symGrid.appendChild(b);
 });
@@ -1978,13 +2108,75 @@ function dropShape(svg){
       <input type="color" class="shape-fill" value="${fillDefault}" title="ڕەنگی پڕکردنەوە">
       <input type="color" class="shape-stroke" value="${strokeDefault}" title="ڕەنگی بۆردەر">
     </div>
-    <div style="width:100%;height:100%">${svg}</div><div class="resize-handle"></div>`;
+    <div class="rotate-handle" title="ڕایکێشە بۆ سووڕاندن">↻</div>
+    <div class="shape-inner">${svg}</div><div class="resize-handle"></div>`;
   canvas.style.position='relative';
   canvas.appendChild(item);
   makeDraggable(item);
+  makeRotatable(item);
   item.querySelector('.shape-fill').addEventListener('input', e=> applyShapeColor(item, e.target.value, null));
   item.querySelector('.shape-stroke').addEventListener('input', e=> applyShapeColor(item, null, e.target.value));
   item.querySelectorAll('.shape-controls input').forEach(inp=> inp.addEventListener('pointerdown', e=> e.stopPropagation()));
+}
+
+/* free rotation for shapes: drag the ↻ handle around the shape to spin it to any angle */
+function makeRotatable(item){
+  const handle = item.querySelector('.rotate-handle');
+  const inner = item.querySelector('.shape-inner');
+  if(!handle || !inner) return;
+  let rotating=false, centerX=0, centerY=0, startOffset=0;
+  handle.addEventListener('pointerdown', e=>{
+    e.stopPropagation();
+    rotating = true;
+    const rect = item.getBoundingClientRect();
+    centerX = rect.left + rect.width/2;
+    centerY = rect.top + rect.height/2;
+    const pointerAngle = Math.atan2(e.clientY-centerY, e.clientX-centerX) * 180/Math.PI;
+    const currentAngle = parseFloat(inner.dataset.angle || '0');
+    startOffset = pointerAngle - currentAngle;
+    handle.setPointerCapture(e.pointerId);
+  });
+  handle.addEventListener('pointermove', e=>{
+    if(!rotating) return;
+    const pointerAngle = Math.atan2(e.clientY-centerY, e.clientX-centerX) * 180/Math.PI;
+    const newAngle = pointerAngle - startOffset;
+    inner.dataset.angle = newAngle;
+    inner.style.transform = `rotate(${newAngle}deg)`;
+  });
+  handle.addEventListener('pointerup', ()=> rotating=false);
+}
+
+/* ============================================================
+   FREE TABLE (custom rows/columns, draggable + resizable)
+============================================================ */
+function dropTable(){
+  const canvas = lastPageCanvas();
+  if(!canvas) return;
+  const d = I18N[currentLang];
+  let rows = parseInt(prompt(d.tableRowsPrompt, '3'), 10);
+  let cols = parseInt(prompt(d.tableColsPrompt, '3'), 10);
+  if(!rows || rows<1) rows = 3;
+  if(!cols || cols<1) cols = 3;
+  rows = Math.min(rows, 30);
+  cols = Math.min(cols, 20);
+  let rowsHtml = '';
+  for(let r=0;r<rows;r++){
+    rowsHtml += '<tr>';
+    for(let c=0;c<cols;c++){
+      rowsHtml += r===0 ? `<th contenteditable="true">${c+1}</th>` : `<td contenteditable="true">&nbsp;</td>`;
+    }
+    rowsHtml += '</tr>';
+  }
+  const item = document.createElement('div');
+  item.className='draggable-item';
+  item.style.left='30px';
+  item.style.top='30px';
+  item.style.width = Math.min(600, Math.max(160, cols*80))+'px';
+  item.style.height = Math.min(500, Math.max(80, rows*36))+'px';
+  item.innerHTML = `<button class="del-x">✕</button><table class="free-table" contenteditable="true">${rowsHtml}</table><div class="resize-handle"></div>`;
+  canvas.style.position='relative';
+  canvas.appendChild(item);
+  makeDraggable(item);
 }
 
 /* ============================================================
